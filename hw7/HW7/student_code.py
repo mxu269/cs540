@@ -11,7 +11,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-mps_enable = False
+mps_enable = True
 device = torch.device("mps") if torch.backends.mps.is_available() and mps_enable else torch.device("cpu")
 print(f"Using device: {device}")
 
