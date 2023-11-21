@@ -15,7 +15,7 @@ import torchvision.transforms as transforms
 from dataloader import MiniPlaces
 from student_code import LeNet, train_model, test_model, count_model_params
 
-mps_enable = True
+mps_enable = False
 device = torch.device("mps") if torch.backends.mps.is_available() and mps_enable else torch.device("cpu")
 print(f"Using device: {device}")
 
