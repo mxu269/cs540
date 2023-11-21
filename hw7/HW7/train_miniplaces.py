@@ -35,7 +35,7 @@ def save_checkpoint(state, is_best,
 # main function for training and testing
 def main(args):
 
-    print(count_model_params());
+    # print(count_model_params())
     # set up random seed
     torch.manual_seed(0)
 
