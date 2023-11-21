@@ -1,2 +1,4 @@
 data/
 *.gz
+__pycache__/
+cs540-venv/
