@@ -21,7 +21,7 @@ class LeNet(nn.Module):
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
         self.conv2 = nn.Conv2d(in_channels=6, out_channels=16, kernel_size=5, stride=1)
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(15, out_features=256)
+        self.fc1 = nn.Linear(400, out_features=256)
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, num_classes)
 
