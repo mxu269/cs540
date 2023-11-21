@@ -49,10 +49,12 @@ class LeNet(nn.Module):
 
         #stage 4
         x = self.fc1(x)
+        x = self.relu(x)
         shape_dict[4] = x.shape
 
         #stage 5
         x = self.fc2(x)
+        x = self.relu(x)
         shape_dict[5] = x.shape
 
         #stage 6
@@ -68,6 +70,7 @@ def count_model_params():
     '''
     model = LeNet()
     model_params = sum(torch.prod(torch.tensor(param.size())) for _, param in model.named_parameters()).item()
+    model_params = model_params/1e6
 
     return model_params
 
