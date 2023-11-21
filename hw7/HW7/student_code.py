@@ -11,6 +11,9 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
+mps_enable = True
+device = torch.device("mps") if torch.backends.mps.is_available() and mps_enable else torch.device("cpu")
+print(f"Using device: {device}")
 
 class LeNet(nn.Module):
     def __init__(self, input_shape=(32, 32), num_classes=100):
@@ -64,7 +67,7 @@ def count_model_params():
     return the number of trainable parameters of LeNet.
     '''
     model = LeNet()
-    model_params = 0.0
+    model_params = sum(torch.prod(torch.tensor(param.size())) for _, param in model.named_parameters()).item()
 
     return model_params
 
@@ -84,7 +87,8 @@ def train_model(model, train_loader, optimizer, criterion, epoch):
         # fill in the standard training loop of forward pass,
         # backward pass, loss computation and optimizer step
         ###################################
-
+        input = input.to(device)
+        target = target.to(device)
         # 1) zero the parameter gradients
         optimizer.zero_grad()
         # 2) forward + backward + optimize
@@ -109,6 +113,8 @@ def test_model(model, test_loader, epoch):
     correct = 0
     with torch.no_grad():
         for input, target in test_loader:
+            input = input.to(device)
+            target = target.to(device)
             output, _ = model(input)
             pred = output.max(1, keepdim=True)[1]
             correct += pred.eq(target.view_as(pred)).sum().item()

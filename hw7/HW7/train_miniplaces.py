@@ -13,8 +13,11 @@ import torchvision
 import torchvision.transforms as transforms
 
 from dataloader import MiniPlaces
-from student_code import LeNet, train_model, test_model
+from student_code import LeNet, train_model, test_model, count_model_params
 
+mps_enable = True
+device = torch.device("mps") if torch.backends.mps.is_available() and mps_enable else torch.device("cpu")
+print(f"Using device: {device}")
 
 def save_checkpoint(state, is_best,
                     file_folder="./outputs/",
@@ -31,13 +34,16 @@ def save_checkpoint(state, is_best,
 
 # main function for training and testing
 def main(args):
+
+    print(count_model_params());
     # set up random seed
     torch.manual_seed(0)
 
     ###################################
     # setup model, loss and optimizer #
     ###################################
-    model = LeNet()
+    model = LeNet().to(device)
+
 
     training_criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
