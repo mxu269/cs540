@@ -89,6 +89,9 @@ def swap_index(state, i, j):
 def max(a, b):
     return a if a > b else b
 
+def list2str(list):
+    str_list = [str(i) for i in list]
+    return ''.join(str_list)
 
 def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     """
@@ -101,87 +104,65 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
         Prints a path of configurations from initial state to goal state along  h values, number of moves, and max queue number in the format specified in the pdf.
     """
     max_length = 0
-    queue_length = 0
 
     open = []
-    closed = []
+    closed = {}
 
     g = 0
     h = get_manhattan_distance(state, goal_state)
     f = g + h
-    parent_index = -1
-    heapq.heappush(open,(f, state, (g, h, parent_index)))
-    queue_length += 1
-    max_length = max(max_length, queue_length)
+    parent_state = -1
+    heapq.heappush(open,(f, state, (g, h, parent_state)))
+    max_length = max(max_length, len(open))
 
     while (True):
         if (not open):
             print("ERROR")
         n = heapq.heappop(open)
-        queue_length -= 1
-        # closed.append(n)
-        closed_index = -1
-        for i, item in enumerate(closed):
-                if item[1] == n[1]:
-                    closed_index = i
-                    break
-        if closed_index == -1:
-            closed_index = len(closed)
-            closed.append(n)
-
+        closed[list2str(n[1])] = n
         if n[1] == goal_state:
             break
         successors = get_succ(n[1])
         
         for s in successors:
             s_in_open_i = -1
-            s_in_closed_i = -1
+            s_in_closed = False
             for i, item in enumerate(open):
                 if item[1] == s:
                     s_in_open_i = i
                     break
-            for i, item in enumerate(closed):
-                if item[1] == s:
-                    s_in_closed_i = i
-                    break
-            
-            # s_in_open_i = next((i for i, item in enumerate(open) if item[1] == s), -1)
-            # s_in_closed_i = next((i for i, item in enumerate(closed) if item[1] == s), -1)
+            if list2str(s) in closed:
+                s_in_closed = True
 
             h = get_manhattan_distance(s, goal_state)
             g = n[2][0] + 1
             f = g + h
-            parent_index = closed_index
-            if (s_in_open_i == -1) and (s_in_closed_i == -1):
-                heapq.heappush(open,(f, s, (g, h, parent_index)))
-                queue_length += 1
-                max_length = max(max_length, queue_length)
+            parent_state = n[1]
+            if (s_in_open_i == -1) and (not s_in_closed):
+                heapq.heappush(open,(f, s, (g, h, parent_state)))
+                max_length = max(max_length, len(open))
             if s_in_open_i != -1:
-                n = open[s_in_open_i]
-                if g < n[2][0]:
-                    open[s_in_open_i] = (f, s, (g, h, parent_index))
+                old = open[s_in_open_i]
+                if g < old[2][0]:
+                    open[s_in_open_i] = (f, s, (g, h, parent_state))
                     heapq.heapify(open)
-                    # heapq.heappush(open,(f, s, (g, h, parent_index)))
-            if s_in_closed_i != -1:
-                n = closed[s_in_closed_i]
-                if g < n[2][0]:
-                    closed[s_in_closed_i] = (f, s, (g, h, parent_index))
-                    if s_in_open_i == -1:
-                        heapq.heappush(open,(f, s, (g, h, parent_index)))    
-                        queue_length += 1
-                        max_length = max(max_length, queue_length)
+            if s_in_closed:
+                old = closed[list2str(s)]
+                if g < old[2][0]:
+                    closed[list2str(s)] = (f, s, (g, h, parent_state))
+                    heapq.heappush(open,(f, s, (g, h, parent_state)))    
+                    max_length = max(max_length, len(open))
 
-    print("finished running")
-    print(*closed, sep='\n')
-    print(closed_index)
+    # print("finished running")
+    # print(*closed, sep='\n')
 
     travelsal = []
-    n = closed[closed_index]
+    n = closed[list2str(goal_state)]
     while (True):
         travelsal.append(n)
         if n[2][2] == -1:
             break
-        n = closed[n[2][2]]
+        n = closed[list2str(n[2][2])]
 
     travelsal.reverse()
 
