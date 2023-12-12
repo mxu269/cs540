@@ -267,14 +267,23 @@ class TeekoPlayer:
         # First, check if the game has a definite winner
         game_val = self.game_value(state)
         if game_val != 0:
-            return game_val
+            return float(game_val)
 
         min_moves_my_piece = self.min_moves_to_win(state, self.my_piece)
         min_moves_opp_piece = self.min_moves_to_win(state, self.opp)
-        offset = min_moves_my_piece - min_moves_opp_piece
 
-        # Heuristic value based on the difference in minimum moves
-        return math.tanh(offset*2 - 4)
+        # Calculate the difference in moves to win
+        move_diff = min_moves_opp_piece - min_moves_my_piece
+
+        # Normalize the difference to a float between -1 and 1
+        # Adjust the normalization factor as needed based on the game's typical move counts
+        normalization_factor = max(min_moves_my_piece, min_moves_opp_piece, 1)
+        heuristic_value = move_diff / normalization_factor
+
+        # Ensure the value is within the bounds of -1 to 1
+        heuristic_value = max(min(heuristic_value, 1), -1)
+
+        return heuristic_value
 
 
 ############################################################################
